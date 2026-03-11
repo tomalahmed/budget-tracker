@@ -9,12 +9,16 @@ A small web app for tracking income and expenses with a clean, minimal interface
 - JavaScript
 - `localStorage` for persistence
 
-## Features
+## Features (Updated -- v2)
 
 - Add income or expense with description, amount, and category
 - Instantly update balance, total income, and total expense
 - View recent transactions with category, date, and delete action
 - Clear all transactions at once
+- Select preferred currency (USD, BDT, INR, AED, EUR)
+- Auto-apply currency symbol in balance, totals, and transaction amounts
+- Dynamic accent styling based on selected currency (badge, button, focus states, toast dot)
+- Remember selected currency using `localStorage`
 - Display toast messages for user feedback
 
 ## What I Learned
@@ -22,6 +26,7 @@ A small web app for tracking income and expenses with a clean, minimal interface
 - Using `localStorage` to save and load transactions after page refresh
 - DOM manipulation for dynamic balance and transaction updates
 - Writing reusable functions (for example, `formatCurrency` and `formatDate`)
+- Applying CSS variables for lightweight runtime theme switching
 - Applying array methods like `filter`, `reduce`, and `map` for totals and rendering
 - Handling UI interactions through buttons, form inputs, and delete actions
 - Designing a minimal interface with Tailwind CSS and custom styles
@@ -33,6 +38,7 @@ A small web app for tracking income and expenses with a clean, minimal interface
 - Formatting numbers and dates in a user-friendly way
 - Making toast notifications animate in and out smoothly
 - Debugging `localStorage` behavior when deleting or clearing transactions
+- Keeping UI style updates consistent when currency/theme changes
 
 ## Project Structure
 
