@@ -19,18 +19,21 @@
     </style>
 </head>
 
-</head>
-
 <body class="bg-[#fafafa] text-gray-900 font-sans antialiased min-h-screen py-10 px-4 sm:px-6 selection:bg-gray-200">
 
   <div class="max-w-[460px] mx-auto space-y-10 relative">
 
     <!-- Top Bar -->
-    <header class="flex items-center justify-between pt-2">
+    <header class="flex items-center justify-between pt-2 gap-4">
       <h1 class="text-xl font-semibold tracking-tight">Budget.</h1>
-      <div
-        class="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md">
-        $
+      <div class="flex items-center gap-3">
+        <select id="currency-select"
+          class="text-xs font-semibold bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-gray-700 focus:outline-none">
+        </select>
+        <div id="currency-badge"
+          class="w-8 h-8 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md theme-accent-bg">
+          $
+        </div>
       </div>
     </header>
 
@@ -74,25 +77,25 @@
 
         <div>
           <input type="text" id="desc" placeholder="What is this for?"
-            class="w-full bg-transparent border-b border-gray-200 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-black transition-colors text-base font-medium">
+            class="w-full bg-transparent border-b border-gray-200 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-theme transition-colors text-base font-medium">
         </div>
 
         <div class="flex gap-4">
           <div class="flex-1 relative">
-            <span class="absolute left-0 top-3 text-gray-400 text-base font-medium">$</span>
+            <span id="amount-symbol" class="absolute left-0 top-3 text-gray-400 text-base font-medium">$</span>
             <input type="number" id="amount" placeholder="0.00"
-              class="w-full bg-transparent border-b border-gray-200 py-3 pl-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-black transition-colors text-base font-medium"
+              class="w-full bg-transparent border-b border-gray-200 py-3 pl-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-theme transition-colors text-base font-medium"
               min="0" step="0.01">
           </div>
           <div class="flex-1 relative">
             <select id="category"
-              class="w-full bg-transparent border-b border-gray-200 py-3 text-gray-900 focus:outline-none focus:border-black transition-colors text-base font-medium appearance-none cursor-pointer pr-6">
+              class="w-full bg-transparent border-b border-gray-200 py-3 text-gray-900 focus:outline-none focus:border-theme transition-colors text-base font-medium appearance-none cursor-pointer pr-6">
             </select>
           </div>
         </div>
 
-        <button onclick="addTransaction()"
-          class="w-full bg-black hover:bg-gray-800 text-white rounded-xl py-3.5 text-sm font-semibold transition-all active:scale-[0.98] mt-2 shadow-lg shadow-black/10">Add
+        <button id="add-tx-btn" onclick="addTransaction()"
+          class="w-full text-white rounded-xl py-3.5 text-sm font-semibold transition-all active:scale-[0.98] mt-2 shadow-lg theme-accent-bg theme-accent-hover">Add
           <span class="ml-1 font-normal opacity-70">to record</span></button>
       </div>
     </section>

@@ -1,5 +1,6 @@
 let transactions = JSON.parse(localStorage.getItem('budgetBuddyMinimal') || '[]');
 let currentType = 'expense';
+const CURRENCY_STORAGE_KEY = 'budgetBuddyCurrency';
 
 // DOM Elements cached for clean DOM manipulation
 const btnIncome = document.getElementById('btn-income');
@@ -12,25 +13,94 @@ const totalIncomeEl = document.getElementById('total-income');
 const totalExpenseEl = document.getElementById('total-expense');
 const txListEl = document.getElementById('tx-list');
 const toastEl = document.getElementById('toast');
+const currencySelect = document.getElementById('currency-select');
+const currencyBadge = document.getElementById('currency-badge');
+const amountSymbolEl = document.getElementById('amount-symbol');
 
 const incomeOptions = ['Salary', 'Business', 'Freelance', 'Gift', 'Other'];
 const expenseOptions = ['Food', 'Transport', 'Bills', 'Shopping', 'Health', 'Education', 'Other'];
 
+const currencies = [
+  { code: 'USD', label: 'US Dollar', symbol: '$', badge: '$', color: '#111111', hover: '#2d2d2d', soft: '#f1f1f1' },
+  { code: 'BDT', label: 'Bangladeshi Taka', symbol: '৳', badge: '৳', color: '#0f766e', hover: '#115e59', soft: '#dff6f2' },
+  { code: 'INR', label: 'Indian Rupee', symbol: '₹', badge: '₹', color: '#ea580c', hover: '#c2410c', soft: '#ffedd5' },
+  { code: 'AED', label: 'Dirham', symbol: 'د.إ', badge: 'دإ', color: '#0f766e', hover: '#0b5f59', soft: '#dbf4ef' },
+  { code: 'EUR', label: 'Euro', symbol: '€', badge: '€', color: '#1d4ed8', hover: '#1e40af', soft: '#dbeafe' }
+];
+
+let currentCurrency = currencies[0];
+
 function init() {
+  populateCurrencyOptions();
+  applyCurrency(localStorage.getItem(CURRENCY_STORAGE_KEY) || currentCurrency.code, false);
   setType('expense');
   render();
+}
+
+function populateCurrencyOptions() {
+  currencySelect.innerHTML = currencies
+    .map((currency) => `<option value="${currency.code}">${currency.symbol} ${currency.label}</option>`)
+    .join('');
+
+  currencySelect.addEventListener('change', (event) => {
+    applyCurrency(event.target.value, true);
+    render();
+    showToast(`Currency changed to ${currentCurrency.label}.`);
+  });
+}
+
+function applyCurrency(code, shouldSave) {
+  const foundCurrency = currencies.find((currency) => currency.code === code) || currencies[0];
+  currentCurrency = foundCurrency;
+
+  currencySelect.value = currentCurrency.code;
+  currencyBadge.textContent = currentCurrency.badge;
+  currencyBadge.title = `${currentCurrency.label} (${currentCurrency.symbol})`;
+  amountSymbolEl.textContent = currentCurrency.symbol;
+
+  document.documentElement.style.setProperty('--theme-color', currentCurrency.color);
+  document.documentElement.style.setProperty('--theme-color-hover', currentCurrency.hover);
+  document.documentElement.style.setProperty('--theme-color-soft', currentCurrency.soft);
+
+  setType(currentType);
+
+  if (shouldSave) {
+    localStorage.setItem(CURRENCY_STORAGE_KEY, currentCurrency.code);
+  }
 }
 
 function setType(type) {
   currentType = type;
 
-  const activeClass = 'bg-white shadow-sm text-gray-900';
+  const baseClass = 'flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all';
   const inactiveClass = 'text-gray-500 hover:text-gray-700';
 
-  btnIncome.className = `flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all ${type === 'income' ? activeClass : inactiveClass}`;
-  btnExpense.className = `flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all ${type === 'expense' ? activeClass : inactiveClass}`;
+  btnIncome.className = `${baseClass} ${type === 'income' ? '' : inactiveClass}`;
+  btnExpense.className = `${baseClass} ${type === 'expense' ? '' : inactiveClass}`;
+
+  applyTypeButtonTheme();
 
   updateCategoryOptions(type);
+}
+
+function applyTypeButtonTheme() {
+  if (currentType === 'income') {
+    btnIncome.style.backgroundColor = 'var(--theme-color-soft)';
+    btnIncome.style.color = 'var(--theme-color)';
+    btnIncome.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+
+    btnExpense.style.backgroundColor = 'transparent';
+    btnExpense.style.color = '';
+    btnExpense.style.boxShadow = 'none';
+  } else {
+    btnExpense.style.backgroundColor = 'var(--theme-color-soft)';
+    btnExpense.style.color = 'var(--theme-color)';
+    btnExpense.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+
+    btnIncome.style.backgroundColor = 'transparent';
+    btnIncome.style.color = '';
+    btnIncome.style.boxShadow = 'none';
+  }
 }
 
 function updateCategoryOptions(type) {
@@ -125,9 +195,9 @@ function render() {
   const balance = income - expense;
 
   const sign = balance < 0 ? '-' : '';
-  balanceEl.textContent = `${sign}$${formatCurrency(Math.abs(balance))}`;
-  totalIncomeEl.textContent = `$${formatCurrency(income)}`;
-  totalExpenseEl.textContent = `$${formatCurrency(expense)}`;
+  balanceEl.textContent = `${sign}${currentCurrency.symbol}${formatCurrency(Math.abs(balance))}`;
+  totalIncomeEl.textContent = `${currentCurrency.symbol}${formatCurrency(income)}`;
+  totalExpenseEl.textContent = `${currentCurrency.symbol}${formatCurrency(expense)}`;
 
   if (transactions.length === 0) {
     txListEl.innerHTML = '<div class="text-center py-12 text-gray-400 text-sm">No transactions yet.</div>';
@@ -161,7 +231,7 @@ function render() {
         <!-- Amount -->
         <div class="text-right shrink-0">
           <div class="font-semibold text-sm ${amountClass}">
-            ${isIncome ? '+' : '-'}$${formatCurrency(t.amount)}
+            ${isIncome ? '+' : '-'}${currentCurrency.symbol}${formatCurrency(t.amount)}
           </div>
           <div class="text-[0.65rem] font-medium text-gray-400 mt-0.5">${formatDate(t.date)}</div>
         </div>
@@ -182,7 +252,7 @@ let toastTimeout;
 function showToast(msg) {
   clearTimeout(toastTimeout);
 
-  toastEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> ${msg}`;
+  toastEl.innerHTML = `<span class="w-2 h-2 rounded-full" style="background-color: var(--theme-color);"></span> ${msg}`;
   toastEl.classList.remove('translate-y-20', 'opacity-0');
 
   toastTimeout = setTimeout(() => {
